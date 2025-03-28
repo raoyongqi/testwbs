@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from translate import google_translate_long_text
+from translator import google_translate_long_text
 
 # 原始 HTML 代码
 html = '''

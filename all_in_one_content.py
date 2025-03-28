@@ -5,10 +5,8 @@ with open('merged/ConvolutionalNeuralNetworks_41-50.html', 'r', encoding='utf-8'
 
 soup = BeautifulSoup(html, 'lxml')
 
-# 获取所有的 <app-record> 元素
 app_records = soup.find_all('app-record')
 
-# 遍历所有的 <app-record> 元素
 for app_record in app_records:
     
     first_content_span = app_record.find('span', attrs={'cdxanalyticsaction': 'Search', 'id': True, 'cdxanalyticscategory': True, 'lang': True})
@@ -32,10 +30,9 @@ for app_record in app_records:
         content_p_tag = first_content_span.find('p')
 
         if content_p_tag:
-            content_p_text = content_p_tag.get_text()
-            print(content_p_text)
 
-            # 创建 <font> 标签并设置相关属性
+            content_p_text = content_p_tag.get_text()
+
             font_wrapper = soup.new_tag('font', **{
                 'class': 'notranslate immersive-translate-target-wrapper',
                 'data-immersive-translate-translation-element-mark': '1',

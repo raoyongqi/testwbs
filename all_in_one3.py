@@ -1,5 +1,7 @@
 import asyncio
 from bs4 import BeautifulSoup, Tag
+import os
+import re
 import time
 from translator import google_translate_long_text_async
 
@@ -68,6 +70,7 @@ async def process_app_records(app_records, start_time):
                     font_tag.append(mark_tag)
 
         app_jcr_sidenav = app_record.find('app-jcr-sidenav')
+        
         if app_jcr_sidenav:
             journey_span = next(
                 (span for span in app_jcr_sidenav.find_all('span') if isinstance(span, Tag) and not span.has_attr('class') and not span.has_attr('style')),
@@ -120,38 +123,70 @@ async def process_app_records(app_records, start_time):
                 first_content_span['style'] = 'max-height:50px'
                 first_content_span['data-immersive-translate-walked'] = '6486b4bb-16ed-40ff-86fa-b7e1ab33e2a7'
 
+
+def sort_files_by_number(files):
+
+    return sorted(files, key=lambda x: [int(i) if i.isdigit() else i.lower() for i in re.split('(\d+)', x)])
+
 if __name__ == "__main__":
-
     
-    with open('test_webofsci/ConvolutionalNeuralNetworks_1.html', 'r', encoding='utf-8') as file:
-        html = file.read()
+    input_folder = "test_webofsci"
+    output_folder = "translate"
 
-    soup = BeautifulSoup(html, 'lxml')
+    all_files = os.listdir(input_folder)
+    html_files = [file for file in all_files if file.endswith('.html')]
 
-    app_records = soup.find_all('app-record')
-    start_time = time.time()
+    sorted_html_files = sort_files_by_number(html_files)
 
-    asyncio.run(process_app_records(app_records, start_time))
+    for file_name in sorted_html_files:
+        
+        input_file_path = os.path.join(input_folder, file_name)
+        
+        
+        output_file_name, _ = os.path.splitext(os.path.basename(input_file_path))
 
-    # 删除不必要的元素
-    selectors_to_remove = [
-        {'method': 'find_all', 'args': {'class_': '_pendo-step-container-size'}},
-        {'method': 'select', 'args': {'selector': '[aria-label="Open Resource Center, 19 new notifications"]'}},
-        {'method': 'select', 'args': {'selector': '[class="show-more show-more-text wos-new-primary-color"]'}}
-    ]
-    for selector in selectors_to_remove:
-        method = getattr(soup, selector['method'])
-        elements_to_remove = method(**selector['args'])
-        for element in elements_to_remove:
-            element.decompose()
+        output_file_path = os.path.join(output_folder, f"{output_file_name}_translate.html")
 
-    modified_html = soup.prettify()
+        # 确保目标文件夹存在
+        os.makedirs(output_folder, exist_ok=True)
+        print(output_file_path)
+        if os.path.exists(output_file_path):
+            print(f"文件 {output_file_path} 已存在，跳过处理。")
+            continue
+        print(f"正在处理文件 {output_file_path} ")
 
-    with open("formatted_html.html", "w", encoding="utf-8") as file:
-        file.write(modified_html)
+        with open(input_file_path, 'r', encoding='utf-8') as file:
+            html = file.read()
 
-    print("HTML 已保存为 formatted_html.html")
+        soup = BeautifulSoup(html, 'lxml')
 
-    end_time = time.time()
-    execution_time = end_time - start_time
-    print(f"执行时间: {execution_time:.4f} 秒")
+        app_records = soup.find_all('app-record')
+        
+        start_time = time.time()
+
+        asyncio.run(process_app_records(app_records, start_time))
+
+        selectors_to_remove = [
+            {'method': 'find_all', 'args': {'class_': '_pendo-step-container-size'}},
+            {'method': 'select', 'args': {'selector': '[aria-label="Open Resource Center, 19 new notifications"]'}},
+            {'method': 'select', 'args': {'selector': '[class="show-more show-more-text wos-new-primary-color"]'}}
+        ]
+        for selector in selectors_to_remove:
+            method = getattr(soup, selector['method'])
+            elements_to_remove = method(**selector['args'])
+            for element in elements_to_remove:
+                element.decompose()
+
+        modified_html = soup.prettify()
+
+
+
+        # 保存修改后的 HTML
+        with open(output_file_path, "w", encoding="utf-8") as file:
+            file.write(modified_html)
+
+        print(f"HTML 已保存为 {output_file_path}")
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"执行时间: {execution_time:.4f} 秒")

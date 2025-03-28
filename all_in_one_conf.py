@@ -59,18 +59,15 @@ for app_record in app_records:
             'lang': 'zh-CN'
         })
 
-        # 添加换行标签
         br_tag = soup.new_tag('br')
         font_wrapper.append(br_tag)
 
-        # 创建第二层的 <font> 标签
         font_translation_wrapper = soup.new_tag('font', **{
             'class': 'notranslate immersive-translate-target-translation-theme-none immersive-translate-target-translation-block-wrapper-theme-none immersive-translate-target-translation-block-wrapper',
             'data-immersive-translate-translation-element-mark': '1'
         })
         font_wrapper.append(font_translation_wrapper)
 
-        # 创建第三层的 <font> 标签
         font_inner = soup.new_tag('font', **{
             'class': 'notranslate immersive-translate-target-inner immersive-translate-target-translation-theme-none-inner',
             'data-immersive-translate-translation-element-mark': '1'
@@ -81,9 +78,7 @@ for app_record in app_records:
 
         font_inner.string = chinese_conf2
         
-        second_conf_span.insert_after(font_wrapper)  # 将翻译结构插入在原标签之后
-
-
+        second_conf_span.insert_after(font_wrapper) 
 
 modified_html = soup.prettify()
 

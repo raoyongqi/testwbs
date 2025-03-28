@@ -21,7 +21,7 @@ if first_app_jcr_sidenav:
         (span for span in all_spans if isinstance(span, Tag) and not span.has_attr('class') and not span.has_attr('style')),
         None
     )
-    
+    (first_span_no_class_style.get_text())
     # 输出第一个没有 class 和 style 属性的 <span> 标签
     if first_span_no_class_style:
         print("Found <span> without class and style attributes:")
