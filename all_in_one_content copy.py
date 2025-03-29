@@ -7,6 +7,7 @@ soup = BeautifulSoup(html, 'lxml')
 
 app_record = soup.find('app-record')
 
+
 first_content_span = app_record.find('span', attrs={'cdxanalyticsaction': 'Search', 'id': True, 'cdxanalyticscategory': True, 'lang': True})
 
 if first_content_span:
@@ -28,16 +29,18 @@ if first_content_span:
     content_p_tag = first_content_span.find('p')
 
     if content_p_tag:
-        
         content_marks = content_p_tag.find_all('mark')
-        
-        title_old_text = ''.join(mark.get_text() for mark in content_marks)
-        
-        title_new_text = ' '.join(mark.get_text() for mark in content_marks)
 
-        content_p_text = content_p_tag.get_text()
+        content_p_old_text = ''.join(mark.get_text() for mark in content_marks)
+
+        content_p_new_text = ' '.join(mark.get_text() for mark in content_marks)
 
 
+        list(map(lambda mark: mark.unwrap(), content_marks))
+
+        content_p_tag.string = content_p_tag.text.replace(content_p_old_text, content_p_new_text)
+
+        content_p_text = content_p_tag.get_text(strip=True)
 
         font_wrapper = soup.new_tag('font', **{
             'class': 'notranslate immersive-translate-target-wrapper',
@@ -60,14 +63,13 @@ if first_content_span:
         })
         font_translation_wrapper.append(font_inner)
 
-        chinese_translation = 'test content 测试内容'
+        chinese_translation = content_p_text
         font_inner.append(chinese_translation)
 
         content_p_tag.append(font_wrapper)
 
     first_content_span['style'] = 'max-height:50px'
     first_content_span['data-immersive-translate-walked'] = '6486b4bb-16ed-40ff-86fa-b7e1ab33e2a7'
-
 
 selectors_to_remove = [
     {'method': 'find_all', 'args': {'class_': '_pendo-step-container-size'}},

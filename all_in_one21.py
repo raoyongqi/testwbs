@@ -53,6 +53,7 @@ async def process_app_records(app_records, start_time):
                 title_a_tag['data-immersive-translate-paragraph'] = '1'
                 title_a_tag['data-immersive-translate-walked'] = '6486b4bb-16ed-40ff-86fa-b7e1ab33e2a7'
 
+                # 获取翻译后的标题
                 translated_title = await translate_tag(title_a_text)
                 font_tag = create_font_tag(translated_title)
                 title_a_tag.append(font_tag)
@@ -67,6 +68,7 @@ async def process_app_records(app_records, start_time):
                     font_tag.append(mark_tag)
 
         app_jcr_sidenav = app_record.find('app-jcr-sidenav')
+        
         if app_jcr_sidenav:
             journey_span = next(
                 (span for span in app_jcr_sidenav.find_all('span') if isinstance(span, Tag) and not span.has_attr('class') and not span.has_attr('style')),
@@ -118,6 +120,9 @@ async def process_app_records(app_records, start_time):
 
                 first_content_span['style'] = 'max-height:50px'
                 first_content_span['data-immersive-translate-walked'] = '6486b4bb-16ed-40ff-86fa-b7e1ab33e2a7'
+
+
+
 
 if __name__ == "__main__":
 
